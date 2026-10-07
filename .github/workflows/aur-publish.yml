@@ -1,0 +1,32 @@
+name: Publish to AUR
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  aur-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Tags are v<pkgver> or v<pkgver>-<pkgrel>, e.g. v0.14.0 or v0.14.0-2
+      - name: Check tag matches PKGBUILD
+        run: |
+          source ./PKGBUILD
+          tag="${GITHUB_REF_NAME#v}"
+          if [ "$tag" != "$pkgver" ] && [ "$tag" != "$pkgver-$pkgrel" ]; then
+            echo "Tag $GITHUB_REF_NAME doesn't match PKGBUILD version $pkgver-$pkgrel"
+            exit 1
+          fi
+
+      - name: Publish to AUR
+        uses: KSXGitHub/github-actions-deploy-aur@v4.2.0
+        with:
+          pkgname: activitywatch-tauri-bin
+          pkgbuild: ./PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: "Update to ${{ github.ref_name }}"

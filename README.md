@@ -29,3 +29,14 @@ git commit -m "Updated .SRCINFO"
 git remote add aur aur@aur.archlinux.org/activitywatch-tauri-bin.git
 git push aur
 ```
+
+### Automated releases
+
+Pushing a `v<pkgver>` (or `v<pkgver>-<pkgrel>`) tag publishes the PKGBUILD to the AUR via
+[`.github/workflows/aur-publish.yml`](.github/workflows/aur-publish.yml), which regenerates `.SRCINFO`.
+The tag must match the version in `PKGBUILD`.
+
+It needs these repository secrets:
+ - `AUR_SSH_PRIVATE_KEY`: SSH private key of an AUR account with push access to the package
+ - `AUR_USERNAME`: name for the AUR commit
+ - `AUR_EMAIL`: email for the AUR commit
